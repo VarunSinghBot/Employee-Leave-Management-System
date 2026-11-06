@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------------------------------ Enums
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  HOD
+}
+
+enum LeaveType {
+  SICK
+  CASUAL
+  EARNED
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  PENDING_HOD
+  INFO_REQUESTED
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum CommentKind {
+  NOTE
+  INFO_REQUEST
+  INFO_RESPONSE
+  APPROVAL
+  REJECTION
+  SYSTEM
+}
+
+// ------------------------------------------------------------------ Models
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String  @id @default(cuid())
+  name         String
+  email        String  @unique
+  password     String
+  role         Role    @default(EMPLOYEE)
+  refreshToken String?
+
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  // Reporting line: an employee's manager reviews stage 1
+  managerId String?
+  manager   User?   @relation("Reports", fields: [managerId], references: [id], onDelete: SetNull)
+  reports   User[]  @relation("Reports")
+
+  leaves         LeaveRequest[]  @relation("EmployeeLeaves")
+  managerReviews LeaveRequest[]  @relation("ManagerReviews")
+  hodReviews     LeaveRequest[]  @relation("HodReviews")
+  documents      LeaveDocument[]
+  comments       LeaveComment[]
+  actorLogs      AuditLog[]      @relation("AuditActor")
+  subjectLogs    AuditLog[]      @relation("AuditSubject")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
+  @@index([managerId])
+}
+
+model LeaveRequest {
+  id         String      @id @default(cuid())
+  employeeId String
+  employee   User        @relation("EmployeeLeaves", fields: [employeeId], references: [id], onDelete: Cascade)
+  type       LeaveType
+  fromDate   DateTime    @db.Date
+  toDate     DateTime    @db.Date
+  days       Int
+  reason     String
+  status     LeaveStatus @default(PENDING)
+
+  // > 3 consecutive days -> documents + manager & HOD approval
+  requiresHodApproval Boolean @default(false)
+
+  managerId       String?
+  manager         User?     @relation("ManagerReviews", fields: [managerId], references: [id], onDelete: SetNull)
+  managerComment  String?
+  managerActionAt DateTime?
+
+  hodId       String?
+  hod         User?     @relation("HodReviews", fields: [hodId], references: [id], onDelete: SetNull)
+  hodComment  String?
+  hodActionAt DateTime?
+
+  documents LeaveDocument[]
+  comments  LeaveComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employeeId, status])
+  @@index([status])
+  @@index([fromDate, toDate])
+}
+
+model LeaveDocument {
+  id           String       @id @default(cuid())
+  leaveId      String
+  leave        LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User         @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  originalName String
+  storedName   String
+  mimeType     String
+  size         Int
+  createdAt    DateTime     @default(now())
+
+  @@index([leaveId])
+}
+
+model LeaveComment {
+  id        String       @id @default(cuid())
+  leaveId   String
+  leave     LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  kind      CommentKind  @default(NOTE)
+  message   String
+  createdAt DateTime     @default(now())
+
+  @@index([leaveId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+
+  // who performed the action
+  actorId String?
+  actor   User?   @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  // whose record it concerns (used to scope visibility)
+  subjectId String?
+  subject   User?   @relation("AuditSubject", fields: [subjectId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([subjectId])
+  @@index([createdAt])
+}

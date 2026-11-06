@@ -1,0 +1,7 @@
+node_modules
+dist
+.turbo
+.env
+*.log
+apps/backend/uploads/*
+!apps/backend/uploads/.gitkeep

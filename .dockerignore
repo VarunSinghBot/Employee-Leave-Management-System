@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/.turbo
+**/.env
+**/*.log
+apps/backend/uploads
+.git
+.claude
+Dockerfile
+docker-compose.yml

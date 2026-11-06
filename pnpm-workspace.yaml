@@ -1,0 +1,13 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Packages allowed to run install scripts (pnpm 10+ blocks them by default)
+allowBuilds:
+  "@prisma/engines": true
+  bcrypt: true
+  esbuild: true
+  prisma: true
+
+minimumReleaseAgeExclude:
+  - lucide-react@1.70.0

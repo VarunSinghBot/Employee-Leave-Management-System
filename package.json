@@ -1,0 +1,24 @@
+{
+  "name": "elms",
+  "private": true,
+  "description": "Employee Leave Management System - Turborepo (Express + Prisma + React)",
+  "packageManager": "pnpm@11.10.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "pnpm --filter @elms/backend db:generate",
+    "db:migrate": "pnpm --filter @elms/backend db:migrate",
+    "db:deploy": "pnpm --filter @elms/backend db:deploy",
+    "db:seed": "pnpm --filter @elms/backend db:seed",
+    "db:setup": "pnpm --filter @elms/shared build && pnpm db:generate && pnpm db:deploy && pnpm db:seed"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.10",
+    "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}
