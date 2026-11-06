@@ -120,6 +120,42 @@ export const findAccessibleLeave = async (user: RequestUser, id: string) => {
   return leave;
 };
 
+// ------------------------------------------------------------------ Approvers
+
+// Department's manager, falling back to its HOD (never the user themself)
+export const findDepartmentApprover = async (departmentId: string, excludeUserId?: string) => {
+  const where = (role: typeof ROLES.MANAGER | typeof ROLES.HOD) => ({
+    departmentId,
+    role,
+    id: excludeUserId ? { not: excludeUserId } : undefined,
+  });
+  return (
+    (await prisma.user.findFirst({ where: where(ROLES.MANAGER), select: { id: true } })) ??
+    (await prisma.user.findFirst({ where: where(ROLES.HOD), select: { id: true } }))
+  );
+};
+
+// Accounts created before their department had a manager get one assigned on their next request
+export const ensureApprover = async (user: RequestUser) => {
+  if (user.managerId) return user.managerId;
+
+  if (user.role === ROLES.HOD) {
+    throw ApiError.badRequest("Heads of department are at the top of the approval chain, so there is no one to approve your leave");
+  }
+  // A manager's leave goes to the HOD; an employee's to the manager (or HOD)
+  const approver =
+    user.role === ROLES.MANAGER
+      ? await prisma.user.findFirst({ where: { departmentId: user.departmentId, role: ROLES.HOD }, select: { id: true } })
+      : await findDepartmentApprover(user.departmentId, user.id);
+  if (!approver) {
+    throw ApiError.badRequest("Your department has no manager or HOD yet, so there is no one to approve your leave. Please contact HR");
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data: { managerId: approver.id } });
+  user.managerId = approver.id;
+  return approver.id;
+};
+
 // ------------------------------------------------------------------ Validation rules
 
 export const assertNoOverlap = async (employeeId: string, from: Date, to: Date, excludeId?: string) => {

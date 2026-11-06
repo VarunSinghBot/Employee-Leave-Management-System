@@ -1,6 +1,7 @@
 import {
   CalendarPlus,
   ClipboardCheck,
+  UserCog,
   FileClock,
   History,
   LayoutDashboard,
@@ -49,6 +50,8 @@ export const AUDIT_ACTION_META: Record<string, { label: string; tone: string }> 
   LEAVE_INFO_REQUESTED: { label: "Info requested", tone: "bg-amber-50 text-amber-700" },
   LEAVE_INFO_PROVIDED: { label: "Info provided", tone: "bg-amber-50 text-amber-700" },
   DOCUMENT_VIEWED: { label: "Document viewed", tone: "bg-indigo-50 text-indigo-700" },
+  MANAGEMENT_ACCOUNT_CREATED: { label: "Management account created", tone: "bg-violet-50 text-violet-700" },
+  EMPLOYEE_ASSIGNED: { label: "Employee assigned", tone: "bg-sky-50 text-sky-700" },
 };
 
 export interface NavItem {
@@ -72,6 +75,7 @@ export const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
     items: [
       { label: "Approvals", to: "/approvals", icon: ClipboardCheck, roles: REVIEWER_ROLES },
       { label: "Team History", to: "/approvals/history", icon: FileClock, roles: REVIEWER_ROLES },
+      { label: "Manage department", to: "/management", icon: UserCog, roles: [ROLES.HOD] },
     ],
   },
   {

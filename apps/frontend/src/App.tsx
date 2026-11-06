@@ -13,6 +13,7 @@ import Approvals from "./pages/manager/Approvals";
 import TeamHistory from "./pages/manager/TeamHistory";
 import AuditLogs from "./pages/AuditLogs";
 import ErrPage from "./ErrPage";
+import Management from "./pages/manager/Management";
 
 function App() {
   // Available to every signed-in user (managers & HODs apply for leave too)
@@ -31,6 +32,8 @@ function App() {
     { path: "approvals/history", element: <TeamHistory /> },
   ];
 
+  const managementRoutes = [{ path: "management", element: <Management /> }];
+
   return (
     <Router>
       <Routes>
@@ -45,6 +48,11 @@ function App() {
             ))}
             <Route element={<ProtectedRoute roles={REVIEWER_ROLES} />}>
               {reviewerRoutes.map((r) => (
+                <Route key={r.path} path={r.path} element={r.element} />
+              ))}
+            </Route>
+            <Route element={<ProtectedRoute roles={[ "HOD" ]} />}>
+              {managementRoutes.map((r) => (
                 <Route key={r.path} path={r.path} element={r.element} />
               ))}
             </Route>

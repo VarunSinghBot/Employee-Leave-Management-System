@@ -25,6 +25,7 @@ import {
   assertBalanceAvailable,
   assertNoOverlap,
   buildLeaveFilters,
+  ensureApprover,
   findAccessibleLeave,
   getLeaveBalance,
   getLeavePermissions,
@@ -108,9 +109,7 @@ export const applyLeave = async (req: Request, res: Response) => {
   const files = getUploadedFiles(req);
   const input = leaveRequestSchema.parse(req.body);
 
-  if (!user.managerId) {
-    throw ApiError.badRequest("No approver is assigned to your account yet. Please contact HR");
-  }
+  await ensureApprover(user);
 
   const { from, to, days, needsHod } = await validateLeaveInput(user, input, files.length);
 

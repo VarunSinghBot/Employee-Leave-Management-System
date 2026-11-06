@@ -7,6 +7,7 @@ import { currentUser } from "../middlewares/auth.middleware.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import { sendResponse } from "../utils/ApiResponse.util.js";
 import { recordAudit } from "../utils/audit.util.js";
+import { findDepartmentApprover } from "../utils/leave.util.js";
 import { clearAuthCookies, hashToken, issueAuthCookies, verifyRefreshToken } from "../utils/token.util.js";
 
 const getProfile = (id: string) => prisma.user.findUniqueOrThrow({ where: { id }, select: AUTH_USER_SELECT });
@@ -26,9 +27,7 @@ export const register = async (req: Request, res: Response) => {
   if (exists) throw ApiError.conflict("An account with this email already exists. Try signing in instead");
 
   // New sign-ups are employees; they report to the department's manager (or HOD as fallback)
-  const approver =
-    (await prisma.user.findFirst({ where: { departmentId: department.id, role: ROLES.MANAGER } })) ??
-    (await prisma.user.findFirst({ where: { departmentId: department.id, role: ROLES.HOD } }));
+  const approver = await findDepartmentApprover(department.id);
 
   const user = await prisma.user.create({
     data: {

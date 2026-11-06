@@ -131,6 +131,7 @@ The compose file ships with placeholder JWT secrets for local use only. Behind H
 | Manager | `manager@elms.dev` | Engineering manager, reports to the HOD |
 | HOD | `hod@elms.dev` | Engineering head, gives the final approval for long leaves |
 | Manager / HOD / Employee | `design.manager@elms.dev`, `design.hod@elms.dev`, `sara@elms.dev` | Design department |
+| Manager / HOD | `hr.manager@elms.dev`, `hr.hod@elms.dev` | Human Resources (new HR sign-ups report to Arjun) |
 
 The login screen has one-click buttons that fill in the Employee, Manager and HOD accounts.
 
@@ -200,6 +201,8 @@ PENDING ──(manager approves, ≤3 days)────────────�
 ---
 
 ## 3. Architecture
+
+> Full walkthrough with Mermaid diagrams (system, request pipeline, auth, data model, leave lifecycle, approval flow, user flows): [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ```
 ELMS/

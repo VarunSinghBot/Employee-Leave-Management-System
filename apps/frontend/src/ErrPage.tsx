@@ -9,7 +9,7 @@ export default function ErrPage() {
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
           <Compass className="size-6 text-violet-500" />
         </span>
-        <p className="mt-6 font-display text-6xl font-semibold tracking-[-0.05em] text-ink">404</p>
+        <p className="mt-6 font-display text-6xl font-semibold tracking-tighter text-ink">404</p>
         <h1 className="mt-2 text-xl font-semibold">This page took a day off</h1>
         <p className="mt-2 text-sm text-slate-500">The page you are looking for doesn't exist or has been moved.</p>
         <Link to="/dashboard" className="mt-6 inline-block">

@@ -43,7 +43,7 @@ async function main() {
   await prisma.department.deleteMany();
 
   const password = await bcrypt.hash(PASSWORD, 10);
-  const [engineering, design] = await Promise.all([
+  const [engineering, design, hr] = await Promise.all([
     prisma.department.create({ data: { name: "Engineering" } }),
     prisma.department.create({ data: { name: "Design" } }),
     prisma.department.create({ data: { name: "Human Resources" } }),
@@ -62,6 +62,10 @@ async function main() {
   const designHod = await createUser("Ananya Iyer", "design.hod@elms.dev", "HOD", design.id);
   const designManager = await createUser("Kabir Singh", "design.manager@elms.dev", "MANAGER", design.id, designHod.id);
   await createUser("Sara Khan", "sara@elms.dev", "EMPLOYEE", design.id, designManager.id);
+
+  // Human Resources hierarchy (every department needs an approver for new sign-ups)
+  const hrHod = await createUser("Meera Nair", "hr.hod@elms.dev", "HOD", hr.id);
+  await createUser("Arjun Rao", "hr.manager@elms.dev", "MANAGER", hr.id, hrHod.id);
 
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
   fs.writeFileSync(path.join(UPLOAD_DIR, "seed-medical-certificate.pdf"), SAMPLE_PDF);
@@ -138,6 +142,8 @@ async function main() {
     { role: "HOD (Design)", email: "design.hod@elms.dev" },
     { role: "Manager (Design)", email: "design.manager@elms.dev" },
     { role: "Employee (Design)", email: "sara@elms.dev" },
+    { role: "HOD (Human Resources)", email: "hr.hod@elms.dev" },
+    { role: "Manager (Human Resources)", email: "hr.manager@elms.dev" },
   ]);
 }
 

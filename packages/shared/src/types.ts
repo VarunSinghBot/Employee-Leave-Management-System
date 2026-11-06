@@ -25,6 +25,16 @@ export interface Department {
   name: string;
 }
 
+export interface ManagementUser extends UserSummary {
+  managerId: string | null;
+  reportsCount: number;
+}
+
+export interface ManagementOverview {
+  managers: ManagementUser[];
+  unassignedEmployees: ManagementUser[];
+}
+
 export interface UserSummary {
   id: string;
   name: string;

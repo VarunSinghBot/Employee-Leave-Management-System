@@ -41,6 +41,7 @@ import authRouter from "./routes/auth.route.js";
 import leaveRouter from "./routes/leave.route.js";
 import approvalRouter from "./routes/approval.route.js";
 import auditRouter from "./routes/audit.route.js";
+import managementRouter from "./routes/management.route.js";
 import { API_PREFIX } from "./constants.js";
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware.js";
 
@@ -52,6 +53,7 @@ app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/leaves`, leaveRouter);
 app.use(`${API_PREFIX}/approvals`, approvalRouter);
 app.use(`${API_PREFIX}/audit`, auditRouter);
+app.use(`${API_PREFIX}/management`, managementRouter);
 
 // Unknown routes + central error handler (must be last)
 app.use(notFoundHandler);

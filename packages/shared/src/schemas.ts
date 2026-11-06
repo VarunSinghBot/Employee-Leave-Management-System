@@ -27,6 +27,24 @@ export const registerSchema = z.object({
 });
 export type RegisterInput = z.infer<typeof registerSchema>;
 
+export const managementAccountSchema = z.object({
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(60, "Name is too long"),
+  email: z.email("Please enter a valid email address").trim().toLowerCase(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Za-z]/, "Password must contain a letter")
+    .regex(/\d/, "Password must contain a number"),
+  role: z.enum(["MANAGER", "HOD"], { error: "Please choose an account role" }),
+});
+export type ManagementAccountInput = z.infer<typeof managementAccountSchema>;
+
+export const assignmentSchema = z.object({
+  employeeId: z.string().min(1, "Employee is required"),
+  managerId: z.string().min(1, "Manager is required"),
+});
+export type AssignmentInput = z.infer<typeof assignmentSchema>;
+
 // Client-side sign-up form: same rules plus a matching confirmation (not sent to the API)
 export const signupFormSchema = registerSchema
   .extend({ confirmPassword: z.string().min(1, "Please confirm your password") })
